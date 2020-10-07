@@ -4,7 +4,7 @@ import React, {
 import { v4 as uuidv4 } from 'uuid';
 
 import {
-  Container, TodoList, Title, Form,
+  Container, TodoList, Title, Form, Card,
 } from './styles';
 
 interface Todo {
@@ -25,13 +25,21 @@ const Main: React.FC = () => {
 
   const [newTodo, setNewTodo] = useState('');
 
+  const [error, setError] = useState('');
+
   const handleNewTodo = useCallback((todo: string) => {
+    setError('');
     setNewTodo(todo);
   }, []);
 
   const handleSetTodos = useCallback(
     (event: FormEvent<HTMLFormElement>): void => {
       event.preventDefault();
+
+      if (!newTodo) {
+        setError('A tarefa não pode ser vazia');
+        return;
+      }
 
       const todo = {
         id: uuidv4(),
@@ -51,7 +59,7 @@ const Main: React.FC = () => {
   return (
     <Container>
       <Title> Cadastre um Todo </Title>
-      <Form onSubmit={(e) => handleSetTodos(e)}>
+      <Form onSubmit={(e) => handleSetTodos(e)} hasError={!!error}>
         <input
           value={newTodo}
           placeholder="Exemplo: Fazer as compras..."
@@ -59,9 +67,12 @@ const Main: React.FC = () => {
         />
         <button type="submit"> Enviar Todo</button>
       </Form>
+      {error && <Title>{error}</Title>}
       <TodoList>
         {todos.map((todo: Todo) => (
-          <li key={todo.id}>{todo.title}</li>
+          <Card>
+            <span key={todo.id}>{todo.title}</span>
+          </Card>
         ))}
       </TodoList>
     </Container>
